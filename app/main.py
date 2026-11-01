@@ -1,4 +1,8 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.core.database import get_db
 
 app = FastAPI(
     title="Finance Tracker API",
@@ -8,6 +12,8 @@ app = FastAPI(
 
 
 @app.get("/health", tags=["Health"])
-def health_check() -> dict[str, str]:
-    """Verifica que el servidor esté activo y respondiendo correctamente."""
-    return {"status": "ok"}
+def health_check(db: Session = Depends(get_db)) -> dict[str, str]:
+    """Verifica que el servidor y la conexión a PostgreSQL estén activos."""
+    db.execute(text("SELECT 1"))
+    return {"status": "ok", "database": "connected"}
+

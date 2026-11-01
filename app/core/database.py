@@ -23,7 +23,7 @@ class Base(DeclarativeBase):
     """Clase base declarativa de SQLAlchemy 2.0 para todos los modelos ORM."""
 
 
-def get_db() -> Generator[Session, None, None]:
+def get_db() -> Generator[Session]:
     """Dependencia de FastAPI que provee una sesión de BD por petición y la cierra al finalizar."""
     db = SessionLocal()
     try:

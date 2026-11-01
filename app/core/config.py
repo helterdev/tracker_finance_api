@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,15 +14,23 @@ class Settings(BaseSettings):
     )
 
     ENVIRONMENT: str = "development"
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "postgres"
-    POSTGRES_DB: str = "tracker_finance"
-    POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: int = 5432
-    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/tracker_finance"
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: int
 
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+
+    @computed_field
+    @property
+    def DATABASE_URL(self) -> str:
+        """Construye la URL de conexión a PostgreSQL dinámicamente desde las variables del .env."""
+        return (
+            f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
 
 
 @lru_cache
